@@ -2,9 +2,12 @@ package de.False.BuildersWand.utilities;
 import de.False.BuildersWand.ConfigurationFiles.Config;
 import de.False.BuildersWand.enums.ParticleShapeHidden;
 import de.False.BuildersWand.items.Wand;
+
+import org.bukkit.Color;
 import org.bukkit.Location;
 import org.bukkit.Particle;
 import org.bukkit.World;
+import org.bukkit.Particle.DustOptions;
 import org.bukkit.block.BlockFace;
 import org.bukkit.entity.Player;
 import org.bukkit.util.Vector;
@@ -30,7 +33,7 @@ public class ParticleUtil
         double z = loc1Vector.getZ();
         int distance = (int) loc1.distance(loc2);
         Vector difference = loc1Vector.subtract(loc2Vector);
-        String particle = wand.getParticle();
+        Particle particle = Particle.REDSTONE;
         int particleAmount = wand.getParticleCount();
         int amount =  distance <= 1 ? particleAmount : distance * particleAmount;
         double xIncrement = (difference.getX() / amount);
@@ -39,13 +42,14 @@ public class ParticleUtil
         for (int i = 0; i < amount; i++)
         {
             Location location = new Location(loc1.getWorld(), x -= xIncrement, y -= yIncrement, z -= zIncrement);
+            DustOptions dustOptions = new DustOptions(Color.fromRGB(29, 240, 184), 1);
             if(config.isRenderForAllPlayers())
             {
-                location.getWorld().spawnParticle(Particle.valueOf(particle), location.getX(), location.getY(), location.getZ(), 0, 128, 0, 0, 10);
+                location.getWorld().spawnParticle(particle, location, 0, dustOptions);
             }
             else
             {
-                player.spawnParticle(Particle.valueOf(particle), location.getX(), location.getY(), location.getZ(), 0, 0, 0, 0);
+                player.spawnParticle(particle, location, 0, dustOptions);
             }
 
         }
