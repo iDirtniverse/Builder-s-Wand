@@ -14,7 +14,7 @@ import java.util.UUID;
 public class InventoryManager
 {
 
-    private HashMap<UUID, ItemStack[]> inventories = new HashMap<>();
+    public static HashMap<UUID, ItemStack[]> inventories = new HashMap<>();
     private Main plugin;
 
     public InventoryManager(Main plugin)

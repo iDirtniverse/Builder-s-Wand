@@ -103,7 +103,7 @@ public class WandStorageEvents implements Listener
     public void inventoryClickEvent(InventoryClickEvent event)
     {
         Inventory storage = event.getInventory();
-        if(storage == null)
+        if(storage == null || !event.getView().getTitle().equals(INVENTORY_NAME))
         {
             return;
         }
@@ -123,13 +123,14 @@ public class WandStorageEvents implements Listener
         Inventory storage = event.getInventory();
         ItemStack itemStack = event.getCurrentItem();
         InventoryAction action = event.getAction();
-        if((action == InventoryAction.HOTBAR_SWAP || action == InventoryAction.HOTBAR_MOVE_AND_READD))
+        if((action == InventoryAction.HOTBAR_SWAP || action == InventoryAction.HOTBAR_MOVE_AND_READD) && event.getView().getTitle().equals(INVENTORY_NAME))
         {
             event.setCancelled(true);
         }
 
         if(
                 storage == null
+                || !event.getView().getTitle().equals(INVENTORY_NAME)
                 || itemStack == null
                 || itemStack.getType().isBlock()
         )
@@ -146,7 +147,7 @@ public class WandStorageEvents implements Listener
         Player player = (Player) event.getPlayer();
         Inventory storage = event.getInventory();
         ItemStack mainHand = player.getInventory().getItemInMainHand();
-        if(mainHand == null || mainHand.getType() == Material.AIR || storage == null)
+        if(mainHand == null || mainHand.getType() == Material.AIR || storage == null || !event.getView().getTitle().equals(INVENTORY_NAME))
         {
             return;
         }
