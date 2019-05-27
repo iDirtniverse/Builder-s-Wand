@@ -35,7 +35,7 @@ public class InventoryManager
             if (!file.isDirectory() && file.getName().endsWith(".yml"))
             {
                 FileConfiguration inventoryFile = YamlConfiguration.loadConfiguration(file);
-                UUID uuid = UUID.fromString(file.getName());
+                UUID uuid = UUID.fromString(file.getName().replaceFirst("[.][^.]+$", ""));
                 ArrayList<ItemStack> content = (ArrayList<ItemStack>) inventoryFile.getList("inventory");
                 ItemStack[] contentArray = new ItemStack[content.size()];
                 for (int i = 0; i < content.size(); i++) {

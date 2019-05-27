@@ -15,29 +15,13 @@
         </repository>
 
         <repository>
-            <id>bintray-tastybento-maven-repo</id>
-            <name>bintray</name>
-            <url>http://dl.bintray.com/tastybento/maven-repo</url>
-        </repository>
-
-        <repository>
             <id>sk89q-repo</id>
             <url>http://maven.sk89q.com/repo/</url>
         </repository>
 
         <repository>
-            <id>factions</id>
-            <url>https://repo.minebench.de/</url>
-        </repository>
-
-        <repository>
             <id>mcmmo</id>
             <url>https://repo.codemc.org/repository/maven-public/</url>
-        </repository>
-
-        <repository>
-            <id>jitpack.io</id>
-            <url>https://jitpack.io</url>
         </repository>
     </repositories>
 
@@ -51,22 +35,6 @@
             <scope>provided</scope>
         </dependency>
 
-        <!--Bukkit API-->
-        <dependency>
-            <groupId>org.bukkit</groupId>
-            <artifactId>bukkit</artifactId>
-            <version>1.14-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
-        </dependency>
-
-        <dependency>
-            <groupId>com.wasteofplastic</groupId>
-            <artifactId>askyblock</artifactId>
-            <version>3.0.8.2</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        
         <dependency>
             <groupId>com.sk89q.worldedit</groupId>
             <artifactId>worldedit-bukkit</artifactId>
@@ -84,33 +52,9 @@
         </dependency>
 
         <dependency>
-            <groupId>com.massivecraft.factions</groupId>
-            <artifactId>factions</artifactId>
-            <version>2.12.0</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.massivecraft.massivecore</groupId>
-            <artifactId>massivecore</artifactId>
-            <version>2.12.0</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
             <groupId>com.gmail.nossr50.mcMMO</groupId>
             <artifactId>mcMMO</artifactId>
             <version>2.1.51-SNAPSHOT</version>
-            <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-
-        <dependency>
-            <groupId>com.github.TechFortress</groupId>
-            <artifactId>GriefPrevention</artifactId>
-            <version>16.7.1</version>
             <scope>provided</scope>
             <optional>true</optional>
         </dependency>
@@ -122,14 +66,6 @@
             <version>0.93</version>
             <scope>provided</scope>
             <optional>true</optional>
-        </dependency>
-
-        <!-- NMS -->
-        <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.13.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
         </dependency>
         
     </dependencies>

@@ -1,10 +1,6 @@
 package de.False.BuildersWand.events;
 
 import com.gmail.nossr50.mcMMO;
-import com.massivecraft.factions.entity.BoardColl;
-import com.massivecraft.factions.entity.Faction;
-import com.massivecraft.factions.entity.MPlayer;
-import com.massivecraft.massivecore.ps.PS;
 import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
 import com.sk89q.worldedit.bukkit.BukkitAdapter;
@@ -12,7 +8,6 @@ import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
 import com.sk89q.worldguard.protection.flags.Flags;
 import com.sk89q.worldguard.protection.regions.RegionQuery;
-import com.wasteofplastic.askyblock.ASkyBlockAPI;
 import de.False.BuildersWand.ConfigurationFiles.Config;
 import de.False.BuildersWand.Main;
 import de.False.BuildersWand.api.canBuildHandler;
@@ -24,7 +19,6 @@ import de.False.BuildersWand.utilities.MessageUtil;
 import de.False.BuildersWand.utilities.ParticleUtil;
 import de.False.BuildersWand.utilities.UUIDItemTagType;
 
-import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
@@ -581,38 +575,6 @@ public class WandEvents implements Listener
             }
         }
 
-        Plugin aSkyBlock = getExternalPlugin("ASkyBlock");
-        if(aSkyBlock != null)
-        {
-            ASkyBlockAPI aSkyBlockAPI = ASkyBlockAPI.getInstance();
-            if(!aSkyBlockAPI.locationIsOnIsland(player, location))
-            {
-                return false;
-            }
-        }
-
-        Plugin griefPreventionPlugin = getExternalPlugin("GriefPrevention");
-        if(griefPreventionPlugin != null)
-        {
-            GriefPrevention griefPrevention = GriefPrevention.instance;
-            if(griefPrevention.allowBuild(player, location) != null)
-            {
-                return false;
-            }
-        }
-
-        Plugin factionsPlugin = getExternalPlugin("Factions");
-        if(factionsPlugin != null)
-        {
-            MPlayer mPlayer = MPlayer.get(player);
-            Faction faction = BoardColl.get().getFactionAt(PS.valueOf(location));
-            if(faction != mPlayer.getFaction())
-            {
-
-                return false;
-            }
-        }
-
         return true;
     }
 
@@ -637,46 +599,6 @@ public class WandEvents implements Listener
                 RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
             	if (!query.testState(BukkitAdapter.adapt(selectionBlock.getLocation()), WorldGuardPlugin.inst().wrapPlayer(player), Flags.BUILD))
             	{
-                    return false;
-                }
-            }
-        }
-
-        Plugin aSkyBlock = getExternalPlugin("ASkyBlock");
-        if(aSkyBlock != null)
-        {
-            ASkyBlockAPI aSkyBlockAPI = ASkyBlockAPI.getInstance();
-            for (Block selectionBlock : selection)
-            {
-                if(!aSkyBlockAPI.locationIsOnIsland(player, selectionBlock.getLocation()))
-                {
-                    return false;
-                }
-            }
-        }
-
-        Plugin griefPreventionPlugin = getExternalPlugin("GriefPrevention");
-        if(griefPreventionPlugin != null)
-        {
-            GriefPrevention griefPrevention = GriefPrevention.instance;
-            for (Block selectionBlock : selection)
-            {
-                if(griefPrevention.allowBuild(player, selectionBlock.getLocation()) != null)
-                {
-                    return false;
-                }
-            }
-        }
-
-        Plugin factionsPlugin = getExternalPlugin("Factions");
-        if(factionsPlugin != null)
-        {
-            MPlayer mPlayer = MPlayer.get(player);
-            for (Block selectionBlock : selection)
-            {
-                Faction faction = BoardColl.get().getFactionAt(PS.valueOf(selectionBlock.getLocation()));
-                if(faction == mPlayer.getFaction())
-                {
                     return false;
                 }
             }
