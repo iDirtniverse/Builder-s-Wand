@@ -73,6 +73,7 @@ public class WandEvents implements Listener
                 tmpReplacements.clear();
                 for (Player player : Bukkit.getOnlinePlayers())
                 {
+                	if (player.getGameMode() == GameMode.SPECTATOR) continue;
 
                     ItemStack mainHand = player.getInventory().getItemInMainHand();
                     Wand wand = wandManager.getWand(mainHand);
@@ -130,6 +131,9 @@ public class WandEvents implements Listener
     public void playerInteract(PlayerInteractEvent event)
     {
         Player player = event.getPlayer();
+        
+        if (player.getGameMode() == GameMode.SPECTATOR) return;
+        
         ItemStack mainHand = player.getInventory().getItemInMainHand();
         Wand wand = wandManager.getWand(mainHand);
 
