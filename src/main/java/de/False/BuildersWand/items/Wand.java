@@ -1,11 +1,13 @@
 package de.False.BuildersWand.items;
 
-import de.False.BuildersWand.NMS.NMS;
+import de.False.BuildersWand.Main;
 import de.False.BuildersWand.utilities.MessageUtil;
+import de.False.BuildersWand.utilities.UUIDItemTagType;
+
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
@@ -13,7 +15,7 @@ import java.util.UUID;
 
 public class Wand
 {
-    private NMS nms;
+    private Main plugin;
 
     private String name;
     private Material material;
@@ -39,9 +41,9 @@ public class Wand
 
     private String permission = "";
 
-    public Wand(NMS nms)
+    public Wand(Main plugin)
     {
-        this.nms = nms;
+        this.plugin = plugin;
     }
 
     public ItemStack getRecipeResult()
@@ -56,9 +58,11 @@ public class Wand
             lore.add(MessageUtil.colorize(getDurabilityText().replace("{durability}", getDurability() + "")));
             itemMeta.setLore(lore);
         }
+        
+        NamespacedKey key = new NamespacedKey(plugin, "uuid");
+        itemMeta.getCustomTagContainer().setCustomTag(key, new UUIDItemTagType(), UUID.randomUUID());
 
         buildersWand.setItemMeta(itemMeta);
-        buildersWand = nms.setTag(buildersWand, "uuid", UUID.randomUUID() + "");
 
         return buildersWand;
     }

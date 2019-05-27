@@ -1,32 +1,42 @@
 package de.False.BuildersWand.manager;
 
 import de.False.BuildersWand.Main;
-import de.False.BuildersWand.NMS.NMS;
 import de.False.BuildersWand.items.Wand;
 import de.False.BuildersWand.utilities.MessageUtil;
+
+import org.apache.commons.lang.StringUtils;
+import org.bukkit.Bukkit;
 import org.bukkit.Material;
+import org.bukkit.NamespacedKey;
+import org.bukkit.Particle;
 import org.bukkit.configuration.ConfigurationSection;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.ShapedRecipe;
+import org.bukkit.inventory.ShapelessRecipe;
 import org.bukkit.inventory.meta.ItemMeta;
 
 import java.io.File;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.Random;
 
 public class WandManager
 {
+	private Main plugin;
     private File file;
     private FileConfiguration config;
     private List<Wand> wandList = new ArrayList<>();
-    private NMS nms;
+    private Random random;
 
-    public WandManager(Main plugin, NMS nms)
+    public WandManager(Main plugin)
     {
+    	this.plugin = plugin;
         this.file = new File(plugin.getDataFolder(), "wands.yml");
-        this.nms = nms;
+        this.random = new Random();
     }
 
     private void loadWands()
@@ -45,7 +55,7 @@ public class WandManager
     private Wand getWand(String key)
     {
         String configPrefix = "wands." + key + ".";
-        Wand wand = new Wand(nms);
+        Wand wand = new Wand(plugin);
         wand.setName(MessageUtil.colorize(config.getString(configPrefix + "name")));
         wand.setMaterial(Material.valueOf(config.getString(configPrefix + "material")));
         wand.setMaxSize(config.getInt(configPrefix + "maxSize"));
@@ -121,7 +131,7 @@ public class WandManager
         config.addDefault(configPrefix + "crafting.shapeless", false);
         config.addDefault(configPrefix + "crafting.recipe", recipeList);
         config.addDefault(configPrefix + "particles.enabled", true);
-        config.addDefault(configPrefix + "particles.type", nms.getDefaultParticle());
+        config.addDefault(configPrefix + "particles.type", Particle.FLAME.toString());
         config.addDefault(configPrefix + "particles.count", 3);
         config.addDefault(configPrefix + "storage.enabled", true);
         config.addDefault(configPrefix + "storage.size", 27);
@@ -167,11 +177,38 @@ public class WandManager
             ItemStack resultItemStack = wand.getRecipeResult();
             if(shapeless)
             {
-                nms.addShapelessRecipe(recipeStrings, ingredients, resultItemStack);
+            	NamespacedKey namespacedKey = new NamespacedKey(plugin, "buildersWand" + random.nextInt());
+                ShapelessRecipe shapelessRecipe = new ShapelessRecipe(namespacedKey, resultItemStack);
+                for (Map.Entry<String, Material> entry: ingredients.entrySet())
+                {
+                    String materialShortcut = entry.getKey();
+                    Material material = entry.getValue();
+                    StringBuilder fullString = new StringBuilder();
+
+                    for (String string: recipeStrings)
+                    {
+                        fullString.append(string);
+                    }
+
+                    int itemCount = StringUtils.countMatches(fullString.toString(),materialShortcut);
+                    shapelessRecipe.addIngredient(itemCount, material);
+                }
+
+                Bukkit.getServer().addRecipe(shapelessRecipe);
             }
             else
             {
-                nms.addShapedRecipe(recipeStrings, ingredients, resultItemStack);
+                NamespacedKey namespacedKey = new NamespacedKey(plugin, "buildersWand" + random.nextInt());
+                ShapedRecipe shapedRecipe = new ShapedRecipe(namespacedKey, resultItemStack);
+                shapedRecipe.shape(recipeStrings.toArray(new String[recipeStrings.size()]));
+                for (Map.Entry<String, Material> entry: ingredients.entrySet())
+                {
+                    String materialShortcut = entry.getKey();
+                    Material material = entry.getValue();
+                    shapedRecipe.setIngredient(materialShortcut.charAt(0), material);
+                }
+
+                Bukkit.getServer().addRecipe(shapedRecipe);
             }
         }
     }

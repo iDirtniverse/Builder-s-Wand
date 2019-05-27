@@ -1,18 +1,20 @@
 package de.False.BuildersWand.events;
 
 import com.gmail.nossr50.mcMMO;
-import com.massivecraft.factions.Factions;
 import com.massivecraft.factions.entity.BoardColl;
 import com.massivecraft.factions.entity.Faction;
 import com.massivecraft.factions.entity.MPlayer;
 import com.massivecraft.massivecore.ps.PS;
 import com.palmergames.bukkit.towny.object.TownyPermission;
 import com.palmergames.bukkit.towny.utils.PlayerCacheUtil;
+import com.sk89q.worldedit.bukkit.BukkitAdapter;
+import com.sk89q.worldguard.WorldGuard;
 import com.sk89q.worldguard.bukkit.WorldGuardPlugin;
+import com.sk89q.worldguard.protection.flags.Flags;
+import com.sk89q.worldguard.protection.regions.RegionQuery;
 import com.wasteofplastic.askyblock.ASkyBlockAPI;
 import de.False.BuildersWand.ConfigurationFiles.Config;
 import de.False.BuildersWand.Main;
-import de.False.BuildersWand.NMS.NMS;
 import de.False.BuildersWand.api.canBuildHandler;
 import de.False.BuildersWand.enums.ParticleShapeHidden;
 import de.False.BuildersWand.items.Wand;
@@ -20,13 +22,14 @@ import de.False.BuildersWand.manager.InventoryManager;
 import de.False.BuildersWand.manager.WandManager;
 import de.False.BuildersWand.utilities.MessageUtil;
 import de.False.BuildersWand.utilities.ParticleUtil;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
+import de.False.BuildersWand.utilities.UUIDItemTagType;
+
 import me.ryanhamshire.GriefPrevention.GriefPrevention;
 import org.apache.commons.lang.ArrayUtils;
 import org.bukkit.*;
 import org.bukkit.block.Block;
 import org.bukkit.block.BlockFace;
+import org.bukkit.block.data.BlockData;
 import org.bukkit.entity.Player;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
@@ -34,10 +37,11 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.block.BlockPlaceEvent;
 import org.bukkit.event.inventory.CraftItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.ItemStack;
 import org.bukkit.inventory.meta.ItemMeta;
-import org.bukkit.material.MaterialData;
+import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 import org.bukkit.plugin.Plugin;
 
 import java.util.*;
@@ -47,7 +51,6 @@ public class WandEvents implements Listener
     private Main plugin;
     private Config config;
     private ParticleUtil particleUtil;
-    private NMS nms;
     private WandManager wandManager;
     private InventoryManager inventoryManager;
     private HashMap<Block, List<Block>> blockSelection = new HashMap<Block, List<Block>>();
@@ -55,12 +58,11 @@ public class WandEvents implements Listener
     private HashMap<Block, List<Block>> tmpReplacements = new HashMap<Block, List<Block>>();
     public static ArrayList<canBuildHandler> canBuildHandlers = new ArrayList<canBuildHandler>();
 
-    public WandEvents(Main plugin, Config config, ParticleUtil particleUtil, NMS nms, WandManager wandManager, InventoryManager inventoryManager)
+    public WandEvents(Main plugin, Config config, ParticleUtil particleUtil, WandManager wandManager, InventoryManager inventoryManager)
     {
         this.plugin = plugin;
         this.config = config;
         this.particleUtil = particleUtil;
-        this.nms = nms;
         this.wandManager = wandManager;
         this.inventoryManager = inventoryManager;
         startScheduler();
@@ -78,7 +80,7 @@ public class WandEvents implements Listener
                 for (Player player : Bukkit.getOnlinePlayers())
                 {
 
-                    ItemStack mainHand = nms.getItemInHand(player);
+                    ItemStack mainHand = player.getInventory().getItemInMainHand();
                     Wand wand = wandManager.getWand(mainHand);
                     Block block = player.getTargetBlock((Set<Material>) null, 5);
                     if (
@@ -120,7 +122,7 @@ public class WandEvents implements Listener
     public void placeBlock(BlockPlaceEvent event)
     {
         Player player = event.getPlayer();
-        ItemStack mainHand = nms.getItemInHand(player);
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
         Wand wand = wandManager.getWand(mainHand);
         if (wand == null)
         {
@@ -134,10 +136,10 @@ public class WandEvents implements Listener
     public void playerInteract(PlayerInteractEvent event)
     {
         Player player = event.getPlayer();
-        ItemStack mainHand = nms.getItemInHand(player);
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
         Wand wand = wandManager.getWand(mainHand);
 
-        if (wand == null || event.getAction() != Action.RIGHT_CLICK_BLOCK || !nms.isMainHand(event))
+        if (wand == null || event.getAction() != Action.RIGHT_CLICK_BLOCK || event.getHand() != EquipmentSlot.HAND)
         {
             return;
         }
@@ -159,12 +161,8 @@ public class WandEvents implements Listener
             return;
         }
 
-        Material blockType = against.getType();
-        byte blockSubId = against.getData();
+        BlockData blockData = against.getBlockData();
         ItemStack itemStack = new ItemStack(against.getType());
-        MaterialData materialData = itemStack.getData();
-        materialData.setData(blockSubId);
-        itemStack.setData(materialData);
         event.setCancelled(true);
         Bukkit.getScheduler().runTaskLater(plugin, () -> {
 
@@ -176,13 +174,7 @@ public class WandEvents implements Listener
                     mcMMO.getPlaceStore().setTrue(selectionBlock);
                 }
 
-                selectionBlock.setType(blockType);
-                try {
-                    Method m = Block.class.getMethod("setData", byte.class);
-                    m.invoke(selectionBlock, blockSubId);
-                } catch (NoSuchMethodException | IllegalAccessException
-                        | InvocationTargetException e) {
-                }
+                selectionBlock.setBlockData(blockData);
             }
 
         }, 1L);
@@ -256,7 +248,10 @@ public class WandEvents implements Listener
             return 0;
         }
 
-        String uuid = nms.getTag(mainHand, "uuid");
+        NamespacedKey key = new NamespacedKey(plugin, "uuid");
+        CustomItemTagContainer tagContainer = mainHand.getItemMeta().getCustomTagContainer();
+        UUID uuid = tagContainer.getCustomTag(key, new UUIDItemTagType());
+       
         ItemStack[] itemStacks = (ItemStack[])ArrayUtils.addAll(inventory.getContents(), inventoryManager.getInventory(uuid));
 
         if(player.getGameMode() == GameMode.CREATIVE)
@@ -272,7 +267,7 @@ public class WandEvents implements Listener
             }
             Material itemMaterial = itemStack.getType();
 
-            if (!itemMaterial.equals(blockMaterial) || block.getData() != itemStack.getData().getData())
+            if (!itemMaterial.equals(blockMaterial))
             {
                 continue;
             }
@@ -334,7 +329,7 @@ public class WandEvents implements Listener
                 continue;
             }
             Material itemMaterial = inventoryItemStack.getType();
-            if (!itemMaterial.equals(material) || itemStack.getData().getData() != inventoryItemStack.getData().getData())
+            if (!itemMaterial.equals(material))
             {
                 continue;
             }
@@ -360,7 +355,10 @@ public class WandEvents implements Listener
             }
         }
 
-        String uuid = nms.getTag(mainHand, "uuid");
+        NamespacedKey key = new NamespacedKey(plugin, "uuid");
+        CustomItemTagContainer tagContainer = mainHand.getItemMeta().getCustomTagContainer();
+        UUID uuid = tagContainer.getCustomTag(key, new UUIDItemTagType());
+        
         ItemStack[] inventoryItemStacks = inventoryManager.getInventory(uuid);
         ArrayList<ItemStack> inventoryItemStacksList = new ArrayList<>(Arrays.asList(inventoryItemStacks));
         for (ItemStack inventoryItemStack : inventoryItemStacks)
@@ -370,7 +368,7 @@ public class WandEvents implements Listener
                 continue;
             }
             Material itemMaterial = inventoryItemStack.getType();
-            if (!itemMaterial.equals(material) || itemStack.getData().getData() != inventoryItemStack.getData().getData())
+            if (!itemMaterial.equals(material))
             {
                 continue;
             }
@@ -393,8 +391,6 @@ public class WandEvents implements Listener
 
     private void setBlockSelection(Player player, BlockFace blockFace, int maxLocations, Block startBlock, Block blockToCheck, Wand wand)
     {
-        int blockToCheckData = blockToCheck.getData();
-        int startBlockData = startBlock.getData();
         Location startLocation = startBlock.getLocation();
         Location checkLocation = blockToCheck.getLocation();
         Material startMaterial = startBlock.getType();
@@ -407,7 +403,6 @@ public class WandEvents implements Listener
                 startLocation.distance(checkLocation) >= wand.getMaxSize()
                         || !(startMaterial.equals(blockToCheckMaterial))
                         || maxLocations <= selection.size()
-                        || blockToCheckData != startBlockData
                         || selection.contains(blockToCheck)
                         || !relativeBlock.equals(Material.AIR)
                         || (!isAllowedToBuildForExternalPlugins(player, checkLocation) && !player.hasPermission("buildersWand.bypass"))
@@ -446,6 +441,8 @@ public class WandEvents implements Listener
                 setBlockSelection(player, blockFace, maxLocations, startBlock, blockEast, wand);
                 setBlockSelection(player, blockFace, maxLocations, startBlock, blockDown, wand);
                 setBlockSelection(player, blockFace, maxLocations, startBlock, blockUp, wand);
+			default:
+				break;
         }
     }
 
@@ -572,13 +569,13 @@ public class WandEvents implements Listener
         Plugin townyPlugin = getExternalPlugin("Towny");
         if(townyPlugin != null)
         {
-            return PlayerCacheUtil.getCachePermission(player, location, 2, (byte)0, TownyPermission.ActionType.BUILD);
+        	return PlayerCacheUtil.getCachePermission(player, location, Material.STONE, TownyPermission.ActionType.BUILD);
         }
 
         Plugin worldGuardPlugin = getExternalPlugin("WorldGuard");
         if (worldGuardPlugin != null && worldGuardPlugin instanceof WorldGuardPlugin) {
-            WorldGuardPlugin worldGuard = (WorldGuardPlugin) worldGuardPlugin;
-            if(!worldGuard.canBuild(player, location))
+            RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            if(!query.testState(BukkitAdapter.adapt(location), WorldGuardPlugin.inst().wrapPlayer(player), Flags.BUILD))
             {
                 return false;
             }
@@ -626,7 +623,7 @@ public class WandEvents implements Listener
         {
             for (Block selectionBlock : selection)
             {
-                if(!PlayerCacheUtil.getCachePermission(player, selectionBlock.getLocation(), 2, (byte)0, TownyPermission.ActionType.BUILD))
+                if(!PlayerCacheUtil.getCachePermission(player, selectionBlock.getLocation(), selectionBlock.getType(), TownyPermission.ActionType.BUILD))
                 {
                     return false;
                 }
@@ -634,12 +631,12 @@ public class WandEvents implements Listener
         }
 
         Plugin worldGuardPlugin = getExternalPlugin("WorldGuard");
-        if (worldGuardPlugin != null && worldGuardPlugin instanceof WorldGuardPlugin) {
-            WorldGuardPlugin worldGuard = (WorldGuardPlugin) worldGuardPlugin;
+        if (worldGuardPlugin != null && worldGuardPlugin instanceof WorldGuardPlugin) {            
             for (Block selectionBlock : selection)
             {
-                if(!worldGuard.canBuild(player, selectionBlock))
-                {
+                RegionQuery query = WorldGuard.getInstance().getPlatform().getRegionContainer().createQuery();
+            	if (!query.testState(BukkitAdapter.adapt(selectionBlock.getLocation()), WorldGuardPlugin.inst().wrapPlayer(player), Flags.BUILD))
+            	{
                     return false;
                 }
             }

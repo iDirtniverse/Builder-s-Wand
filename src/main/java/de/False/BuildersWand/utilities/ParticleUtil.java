@@ -1,6 +1,5 @@
 package de.False.BuildersWand.utilities;
 import de.False.BuildersWand.ConfigurationFiles.Config;
-import de.False.BuildersWand.NMS.NMS;
 import de.False.BuildersWand.enums.ParticleShapeHidden;
 import de.False.BuildersWand.items.Wand;
 import org.bukkit.Location;
@@ -14,12 +13,10 @@ import java.util.List;
 
 public class ParticleUtil
 {
-    private NMS nms;
     private Config config;
 
-    public ParticleUtil(NMS nms, Config config)
+    public ParticleUtil(Config config)
     {
-        this.nms = nms;
         this.config = config;
     }
 
@@ -44,11 +41,11 @@ public class ParticleUtil
             Location location = new Location(loc1.getWorld(), x -= xIncrement, y -= yIncrement, z -= zIncrement);
             if(config.isRenderForAllPlayers())
             {
-                nms.spawnParticle(particle, location);
+                location.getWorld().spawnParticle(Particle.valueOf(particle), location.getX(), location.getY(), location.getZ(), 0, 128, 0, 0, 10);
             }
             else
             {
-                nms.spawnParticle(particle, location, player);
+                player.spawnParticle(Particle.valueOf(particle), location.getX(), location.getY(), location.getZ(), 0, 0, 0, 0);
             }
 
         }

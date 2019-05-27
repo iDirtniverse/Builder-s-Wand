@@ -1,9 +1,6 @@
 package de.False.BuildersWand.manager;
 
 import de.False.BuildersWand.Main;
-import de.False.BuildersWand.NMS.NMS;
-import org.apache.commons.io.FilenameUtils;
-import org.bukkit.Bukkit;
 import org.bukkit.configuration.file.FileConfiguration;
 import org.bukkit.configuration.file.YamlConfiguration;
 import org.bukkit.inventory.ItemStack;
@@ -12,19 +9,21 @@ import java.io.File;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.UUID;
 
 public class InventoryManager
 {
 
-    private HashMap<String, ItemStack[]> inventories = new HashMap<>();
+    private HashMap<UUID, ItemStack[]> inventories = new HashMap<>();
     private Main plugin;
 
-    public InventoryManager(Main plugin, NMS nms)
+    public InventoryManager(Main plugin)
     {
         this.plugin = plugin;
     }
 
-    public void load(){
+    @SuppressWarnings("unchecked")
+	public void load(){
         File[] files = new File(plugin.getDataFolder() + "/storage").listFiles();
         if (files == null)
         {
@@ -36,7 +35,7 @@ public class InventoryManager
             if (!file.isDirectory() && file.getName().endsWith(".yml"))
             {
                 FileConfiguration inventoryFile = YamlConfiguration.loadConfiguration(file);
-                String uuid = file.getName().replaceFirst("[.][^.]+$", "");
+                UUID uuid = UUID.fromString(file.getName());
                 ArrayList<ItemStack> content = (ArrayList<ItemStack>) inventoryFile.getList("inventory");
                 ItemStack[] contentArray = new ItemStack[content.size()];
                 for (int i = 0; i < content.size(); i++) {
@@ -53,7 +52,7 @@ public class InventoryManager
         }
     }
 
-    public ItemStack[] getInventory(String uuid){
+    public ItemStack[] getInventory(UUID uuid){
         if(!inventories.containsKey(uuid))
         {
             return new ItemStack[0];
@@ -62,10 +61,10 @@ public class InventoryManager
         return inventories.get(uuid);
     }
 
-    public void setInventory(String uuid, ItemStack[] itemStack){
+    public void setInventory(UUID uuid, ItemStack[] itemStack){
         inventories.put(uuid, itemStack);
 
-        String filePath = "storage/" + uuid + ".yml";
+        String filePath = "storage/" + uuid.toString() + ".yml";
         File storageFile = new File(plugin.getDataFolder(), filePath);
         FileConfiguration storageConfigurationFile = YamlConfiguration.loadConfiguration(storageFile);
         storageConfigurationFile.set("inventory", itemStack);

@@ -1,26 +1,30 @@
 package de.False.BuildersWand;
 
 import de.False.BuildersWand.ConfigurationFiles.Config;
-import de.False.BuildersWand.NMS.NMS;
 import de.False.BuildersWand.items.Wand;
 import de.False.BuildersWand.manager.WandManager;
 import de.False.BuildersWand.utilities.MessageUtil;
+import de.False.BuildersWand.utilities.UUIDItemTagType;
+
 import org.bukkit.Bukkit;
+import org.bukkit.NamespacedKey;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 import org.bukkit.entity.Player;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.ItemMeta;
 
 import java.util.UUID;
 
 public class Commands implements CommandExecutor {
+	
+	private Main plugin;
     private Config config;
     private WandManager wandManager;
-    private NMS nms;
 
-    Commands(Config config, WandManager wandManager, NMS nms) {
-        this.nms = nms;
+    Commands(Main plugin, Config config, WandManager wandManager) {
+        this.plugin = plugin;
         this.config = config;
         this.wandManager = wandManager;
     }
@@ -95,7 +99,10 @@ public class Commands implements CommandExecutor {
         }
 
         ItemStack itemStack = wand.getRecipeResult();
-        itemStack = nms.setTag(itemStack, "uuid", UUID.randomUUID() + "");
+        ItemMeta itemMeta = itemStack.getItemMeta();
+        NamespacedKey key = new NamespacedKey(plugin, "uuid");
+        itemMeta.getCustomTagContainer().setCustomTag(key, new UUIDItemTagType(), UUID.randomUUID());
+        itemStack.setItemMeta(itemMeta);
         destPlayer.getInventory().addItem(itemStack);
     }
 

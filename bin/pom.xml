@@ -47,7 +47,7 @@
         <dependency>
             <groupId>org.spigotmc</groupId>
             <artifactId>spigot-api</artifactId>
-            <version>1.13.2-R0.1-SNAPSHOT</version>
+            <version>1.14-R0.1-SNAPSHOT</version>
             <scope>provided</scope>
         </dependency>
 
@@ -64,15 +64,6 @@
             <artifactId>askyblock</artifactId>
             <version>3.0.8.2</version>
             <scope>provided</scope>
-            <optional>true</optional>
-        </dependency>
-        
-        <dependency>
-            <groupId>com.sk89q.worldedit</groupId>
-            <artifactId>worldedit-bukkit</artifactId>
-            <version>7.0.0-SNAPSHOT</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -80,7 +71,6 @@
             <artifactId>worldguard-core</artifactId>
             <version>7.0.0-SNAPSHOT</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -88,7 +78,6 @@
             <artifactId>factions</artifactId>
             <version>2.12.0</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
@@ -96,23 +85,18 @@
             <artifactId>massivecore</artifactId>
             <version>2.12.0</version>
             <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.gmail.nossr50.mcMMO</groupId>
             <artifactId>mcMMO</artifactId>
             <version>2.1.51-SNAPSHOT</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <dependency>
             <groupId>com.github.TechFortress</groupId>
             <artifactId>GriefPrevention</artifactId>
             <version>16.7.1</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <!-- Add this yourself to your local Maven repo! -->
@@ -120,18 +104,97 @@
             <groupId>towny</groupId>
             <artifactId>towny</artifactId>
             <version>0.93</version>
-            <scope>provided</scope>
-            <optional>true</optional>
         </dependency>
 
         <!-- NMS -->
         <dependency>
-            <groupId>com.destroystokyo.paper</groupId>
-            <artifactId>paper-api</artifactId>
-            <version>1.13.2-R0.1-SNAPSHOT</version>
-            <scope>provided</scope>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.14</artifactId>
+            <version>1.14</version>
+            <systemPath>${spigot.jars}/spigot-1.14.1.jar</systemPath>
+            <scope>system</scope>
         </dependency>
-        
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.13.2</artifactId>
+            <version>1.13.2</version>
+            <systemPath>${spigot.jars}/spigot-1.13.2.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.13</artifactId>
+            <version>1.13</version>
+            <systemPath>${spigot.jars}/spigot-1.13.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.12.2</artifactId>
+            <version>1.12.2</version>
+            <systemPath>${spigot.jars}/spigot-1.12.2.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.11.2</artifactId>
+            <version>1.11.2</version>
+            <systemPath>${spigot.jars}/spigot-1.11.2.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.10.2</artifactId>
+            <version>1.10.2</version>
+            <systemPath>${spigot.jars}/spigot-1.10.2.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.9.4</artifactId>
+            <version>1.9.4</version>
+            <systemPath>${spigot.jars}/spigot-1.9.4.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.9</artifactId>
+            <version>1.9</version>
+            <systemPath>${spigot.jars}/spigot-1.9.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.8.8</artifactId>
+            <version>1.8.8</version>
+            <systemPath>${spigot.jars}/spigot-1.8.8.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.8.3</artifactId>
+            <version>1.8.3</version>
+            <systemPath>${spigot.jars}/spigot-1.8.3.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>org.spigotmc</groupId>
+            <artifactId>spigot-1.8</artifactId>
+            <version>1.8</version>
+            <systemPath>${spigot.jars}/spigot-1.8.jar</systemPath>
+            <scope>system</scope>
+        </dependency>
+
     </dependencies>
 
     <build>

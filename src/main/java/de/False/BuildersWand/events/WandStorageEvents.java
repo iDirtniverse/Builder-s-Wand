@@ -2,12 +2,14 @@ package de.False.BuildersWand.events;
 
 import de.False.BuildersWand.ConfigurationFiles.Config;
 import de.False.BuildersWand.Main;
-import de.False.BuildersWand.NMS.NMS;
-import de.False.BuildersWand.inventory.BWHolder;
 import de.False.BuildersWand.items.Wand;
 import de.False.BuildersWand.manager.InventoryManager;
 import de.False.BuildersWand.manager.WandManager;
 import de.False.BuildersWand.utilities.MessageUtil;
+import de.False.BuildersWand.utilities.UUIDItemTagType;
+
+import java.util.UUID;
+
 import org.bukkit.*;
 import org.bukkit.entity.Item;
 import org.bukkit.entity.Player;
@@ -17,23 +19,21 @@ import org.bukkit.event.block.Action;
 import org.bukkit.event.inventory.*;
 import org.bukkit.event.player.PlayerDropItemEvent;
 import org.bukkit.event.player.PlayerInteractEvent;
+import org.bukkit.inventory.EquipmentSlot;
 import org.bukkit.inventory.Inventory;
 import org.bukkit.inventory.InventoryView;
 import org.bukkit.inventory.ItemStack;
+import org.bukkit.inventory.meta.tags.CustomItemTagContainer;
 
 public class WandStorageEvents implements Listener
 {
     private Main plugin;
-    private Config config;
-    private NMS nms;
     private WandManager wandManager;
     private InventoryManager inventoryManager;
     private String INVENTORY_NAME;
-    public WandStorageEvents(Main plugin, Config config, NMS nms, WandManager wandManager, InventoryManager inventoryManager)
+    public WandStorageEvents(Main plugin, Config config, WandManager wandManager, InventoryManager inventoryManager)
     {
         this.plugin = plugin;
-        this.config = config;
-        this.nms = nms;
         this.wandManager = wandManager;
         this.inventoryManager = inventoryManager;
         INVENTORY_NAME = MessageUtil.colorize("&1Builders Wand Storage");
@@ -43,7 +43,7 @@ public class WandStorageEvents implements Listener
     public void openInventory(PlayerInteractEvent event)
     {
         Player player = event.getPlayer();
-        ItemStack mainHand = nms.getItemInHand(player);
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
         Wand wand = wandManager.getWand(mainHand);
 
         if(mainHand.getType() == Material.AIR)
@@ -51,12 +51,15 @@ public class WandStorageEvents implements Listener
             return;
         }
 
-        String uuid = nms.getTag(mainHand, "uuid");
+        NamespacedKey key = new NamespacedKey(plugin, "uuid");
+        CustomItemTagContainer tagContainer = mainHand.getItemMeta().getCustomTagContainer();
+        UUID uuid = tagContainer.getCustomTag(key, new UUIDItemTagType());
+        
         Action action = event.getAction();
         if (
                 wand == null
                 || (action != Action.LEFT_CLICK_AIR && action != Action.LEFT_CLICK_BLOCK)
-                || !nms.isMainHand(event)
+                || event.getHand() != EquipmentSlot.HAND
                 || !player.isSneaking()
         )
         {
@@ -99,7 +102,6 @@ public class WandStorageEvents implements Listener
     @EventHandler
     public void inventoryClickEvent(InventoryClickEvent event)
     {
-        Player player = (Player) event.getWhoClicked();
         Inventory storage = event.getInventory();
         if(storage == null)
         {
@@ -143,14 +145,16 @@ public class WandStorageEvents implements Listener
     {
         Player player = (Player) event.getPlayer();
         Inventory storage = event.getInventory();
-        ItemStack mainHand = nms.getItemInHand(player);
+        ItemStack mainHand = player.getInventory().getItemInMainHand();
         if(mainHand == null || mainHand.getType() == Material.AIR || storage == null)
         {
             return;
         }
 
         ItemStack[] content = storage.getContents();
-        String uuid = nms.getTag(mainHand, "uuid");
+        NamespacedKey key = new NamespacedKey(plugin, "uuid");
+        CustomItemTagContainer tagContainer = mainHand.getItemMeta().getCustomTagContainer();
+        UUID uuid = tagContainer.getCustomTag(key, new UUIDItemTagType());
         inventoryManager.setInventory(uuid, content);
     }
 }
