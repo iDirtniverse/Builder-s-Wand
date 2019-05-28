@@ -152,6 +152,9 @@ public class WandEvents implements Listener {
 				}
 
 				selectionBlock.setBlockData(blockData);
+				
+				BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(selectionBlock, selectionBlock.getState(), against, mainHand, player, true, EquipmentSlot.HAND);
+				Bukkit.getServer().getPluginManager().callEvent(blockPlaceEvent);
 			}
 
 		}, 1L);
