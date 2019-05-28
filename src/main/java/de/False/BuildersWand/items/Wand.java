@@ -61,7 +61,6 @@ public class Wand
         
         NamespacedKey key = new NamespacedKey(plugin, "uuid");
         itemMeta.getCustomTagContainer().setCustomTag(key, new UUIDItemTagType(), UUID.randomUUID());
-
         buildersWand.setItemMeta(itemMeta);
 
         return buildersWand;
