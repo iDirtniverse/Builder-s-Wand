@@ -286,6 +286,17 @@ public class WandEvents implements Listener {
 		Integer newDurability = durability - 1;
 
 		if (newDurability <= 0) {
+			NamespacedKey key = new NamespacedKey(plugin, "uuid");
+			CustomItemTagContainer tagContainer = wandItemStack.getItemMeta().getCustomTagContainer();
+			UUID uuid = tagContainer.getCustomTag(key, new UUIDItemTagType());
+
+			ItemStack[] inventoryItemStacks = inventoryManager.getInventory(uuid);
+			for (ItemStack inventoryItemStack : inventoryItemStacks) {
+				if (inventoryItemStack == null) {
+					continue;
+				}
+				player.getWorld().dropItem(player.getLocation(), inventoryItemStack);
+			}
 			inventory.removeItem(wandItemStack);
 		}
 
