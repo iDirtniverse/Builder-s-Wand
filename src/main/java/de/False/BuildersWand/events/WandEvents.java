@@ -210,19 +210,22 @@ public class WandEvents implements Listener {
 
 		if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
 			event.setCancelled(true);
+	        player.updateInventory();
 			int itemsChecked = 0;
 			int possibleCreations = 1;
-			if (event.isShiftClick()) for (ItemStack item : event.getInventory().getMatrix()) {
-				if (item != null && !item.getType().equals(Material.AIR)) {
-					if (itemsChecked == 0) possibleCreations = item.getAmount();
-					else possibleCreations = Math.min(possibleCreations, item.getAmount());
-					itemsChecked++;
+			if (event.isShiftClick()) {
+				for (ItemStack item : event.getInventory().getMatrix()) {
+					if (item != null && !item.getType().equals(Material.AIR)) {
+						if (itemsChecked == 0) possibleCreations = item.getAmount();
+						else possibleCreations = Math.min(possibleCreations, item.getAmount());
+						itemsChecked++;
+					}
 				}
 			}
 			long emptySpace = Stream.of(player.getInventory().getStorageContents()).filter(i -> i == null).count();
 			int amountOfItems = Math.toIntExact(Math.min(possibleCreations, emptySpace));
 			Stream.of(event.getInventory().getMatrix()).filter(i -> i != null).forEach(i -> i.setAmount(i.getAmount() - amountOfItems));
-			for (int x = 1; x < amountOfItems; x++) {
+			for (int x = 0; x < amountOfItems; x++) {
 				ItemStack itemStack = wand.getRecipeResult();
 				ItemMeta itemMeta = itemStack.getItemMeta();
 				NamespacedKey key = new NamespacedKey(plugin, "uuid");
