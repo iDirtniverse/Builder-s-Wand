@@ -152,7 +152,7 @@ public class WandEvents implements Listener {
 				}
 
 				selectionBlock.setBlockData(blockData);
-				
+
 				BlockPlaceEvent blockPlaceEvent = new BlockPlaceEvent(selectionBlock, selectionBlock.getState(), against, mainHand, player, true, EquipmentSlot.HAND);
 				Bukkit.getServer().getPluginManager().callEvent(blockPlaceEvent);
 			}
@@ -210,7 +210,7 @@ public class WandEvents implements Listener {
 
 		if (event.getClick() == ClickType.SHIFT_LEFT || event.getClick() == ClickType.SHIFT_RIGHT) {
 			event.setCancelled(true);
-	        player.updateInventory();
+			player.updateInventory();
 			int itemsChecked = 0;
 			int possibleCreations = 1;
 			if (event.isShiftClick()) {
@@ -229,9 +229,9 @@ public class WandEvents implements Listener {
 				ItemStack itemStack = wand.getRecipeResult();
 				ItemMeta itemMeta = itemStack.getItemMeta();
 				NamespacedKey key = new NamespacedKey(plugin, "uuid");
-		        itemMeta.getCustomTagContainer().setCustomTag(key, new UUIDItemTagType(), UUID.randomUUID());
-		        itemStack.setItemMeta(itemMeta);
-		        player.getInventory().addItem(itemStack);
+				itemMeta.getCustomTagContainer().setCustomTag(key, new UUIDItemTagType(), UUID.randomUUID());
+				itemStack.setItemMeta(itemMeta);
+				player.getInventory().addItem(itemStack);
 			}
 			player.closeInventory();
 		}
