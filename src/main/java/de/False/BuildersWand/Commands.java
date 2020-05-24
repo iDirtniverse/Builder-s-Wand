@@ -62,39 +62,34 @@ public class Commands implements CommandExecutor {
         wandManager.load();
     }
 
-    private void giveCommand(CommandSender player, String[] args) {
-        boolean isPlayerInstance = player instanceof Player;
-        if (isPlayerInstance && !player.hasPermission("buildersWand.give")) {
-            MessageUtil.sendMessage(player, "noPermissions");
+    private void giveCommand(CommandSender sender, String[] args) {
+        if (!sender.hasPermission("buildersWand.give")) {
+            MessageUtil.sendMessage(sender, "noPermissions");
             return;
         }
         Wand wand;
         Player destPlayer;
 
         if (args.length < 1) {
-            helpCommand(player);
+            helpCommand(sender);
             return;
-        } else if (args.length == 1 && isPlayerInstance) {
+        } else if (args.length == 1 && sender instanceof Player) {
             wand = wandManager.getWandTier(1);
-            destPlayer = (Player) player;
+            destPlayer = (Player) sender;
 
         } else if (args.length == 2) {
             destPlayer = Bukkit.getPlayer(args[1]);
             wand = wandManager.getWandTier(1);
         } else {
-            if (!(player instanceof Player)) {
-                MessageUtil.sendMessage(player, "noPermissions");
-                return;
-            }
             wand = wandManager.getWandTier(Integer.parseInt(args[2]));
             destPlayer = Bukkit.getPlayer(args[1]);
         }
 
         if (destPlayer == null) {
-            MessageUtil.sendMessage(player, "playerNotFound");
+            MessageUtil.sendMessage(sender, "playerNotFound");
             return;
         } else if (wand == null) {
-            MessageUtil.sendMessage(player, "wandNotFound");
+            MessageUtil.sendMessage(sender, "wandNotFound");
             return;
         }
 
